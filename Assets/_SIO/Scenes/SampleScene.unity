@@ -990,6 +990,8 @@ MonoBehaviour:
   characterData: {fileID: 11400000, guid: b793989debb593e4a8f228d24fb66e65, type: 2}
   characterController: {fileID: 1993029017}
   characterTransform: {fileID: 1993029018}
+  characterTarget: {fileID: 672602979}
+  aiState: 1
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
