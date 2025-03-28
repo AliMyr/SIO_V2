@@ -2,9 +2,14 @@ using UnityEngine;
 
 public class PlayerCharacter : Character
 {
+    public IAttackComponent AttackComponent { get; private set; }
+
     public override void Initialize()
     {
         base.Initialize();
+
+        AttackComponent = new PlayerAttackComponent();
+        AttackComponent.Initialize(this);
     }
 
     protected override void Update()
@@ -19,5 +24,12 @@ public class PlayerCharacter : Character
 
         MovableComponent.Move(moveDirection);
         MovableComponent.Rotate(moveDirection);
+
+        ProcessAutoAttack();
+    }
+
+    private void ProcessAutoAttack()
+    {
+        // Заглушка для логики авто-атаки
     }
 }
