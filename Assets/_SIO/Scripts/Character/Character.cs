@@ -1,16 +1,20 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class Character : MonoBehaviour
 {
-    public virtual void Initialize()
-    {
+    [SerializeField] private CharacterData characterData;
 
-    }
+    public CharacterData CharacterData => characterData;
+    public IHealthComponent HealthComponent { get; private set; }
 
-    private void Start()
+    protected virtual void Awake()
     {
         Initialize();
+    }
+
+    public virtual void Initialize()
+    {
+        HealthComponent = new HealthComponent();
+        HealthComponent.Initialize(this);
     }
 }
