@@ -12,4 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03ba30fd5bbc1724aa6f31550f810ddb, type: 3}
   m_Name: DefaultEnemy
   m_EditorClassIdentifier: 
-  maxHealth: 0
+  maxHealth: 50
+  speed: 3
+  turnSmoothTime: 0.1

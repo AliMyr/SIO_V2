@@ -6,4 +6,9 @@ public class EnemyCharacter : Character
     {
         base.Initialize();
     }
+
+    protected override void Update()
+    {
+
+    }
 }
