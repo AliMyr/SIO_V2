@@ -6,6 +6,7 @@ public class GameManager : MonoBehaviour
 {
     [SerializeField] private GameData gameData;
     [SerializeField] private CharacterFactory characterFactory;
+    [SerializeField] private WindowsService windowsService;
 
     private ScoreSystem scoreSystem;
     private float gameSessionTime;
@@ -14,6 +15,7 @@ public class GameManager : MonoBehaviour
 
     public static GameManager Instance { get; private set; }
     public CharacterFactory CharacterFactory => characterFactory;
+    public WindowsService WindowsService => windowsService;
     public ScoreSystem ScoreSystem => scoreSystem;
     public float GameSessionTime => gameSessionTime;
     public bool IsGameActive => isGameActive;
@@ -89,6 +91,7 @@ public class GameManager : MonoBehaviour
         {
             case CharacterType.Player:
                 GameOver();
+
                 break;
 
             case CharacterType.DefaultEnemy:
@@ -121,12 +124,18 @@ public class GameManager : MonoBehaviour
     {
         EndGame();
         Debug.Log("Victory");
+
+        WindowsService.HideWindow<GameplayWindow>(true);
+        WindowsService.ShowWindow<VictoryWindow>(false);
     }
 
     private void GameOver()
     {
         EndGame();
         Debug.Log("Defeat");
+
+        WindowsService.HideWindow<GameplayWindow>(true);
+        WindowsService.ShowWindow<DefeatWindow>(true);
     }
 
     private void EndGame()
