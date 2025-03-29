@@ -71,7 +71,7 @@ public class GameManager : MonoBehaviour
             timeBetweenEnemySpawn = gameData.TimeBetweenEnemySpawn;
         }
 
-        if (gameSessionTime >= gameData.SessionTimeMinutes)
+        if (gameSessionTime >= gameData.SessionTimeSeconds)
         {
             GameVictory();
         }
