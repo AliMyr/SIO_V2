@@ -2,8 +2,9 @@ using UnityEngine;
 
 public class EnemyCharacter : Character
 {
-    [SerializeField] private Character characterTarget;
     [SerializeField] private AiState aiState;
+    public override Character CharacterTarget => 
+        GameManager.Instance.CharacterFactory.Player;
 
     public IAttackComponent AttackComponent { get; protected set; }
 
@@ -17,7 +18,7 @@ public class EnemyCharacter : Character
 
     protected override void Update()
     {
-        if(HealthComponent.CurrentHealth <= 0 || characterTarget == null)
+        if (HealthComponent.CurrentHealth <= 0 || CharacterTarget == null)
             return;
 
         switch (aiState)
@@ -26,15 +27,16 @@ public class EnemyCharacter : Character
                 return;
 
             case AiState.MoveToTarget:
-                Vector3 moveDirection = 
-                    (characterTarget.CharacterTransform.position - 
-                    CharacterTransform.position).normalized;
+                Vector3 moveDirection = (CharacterTarget.CharacterTransform.position -
+                                         CharacterTransform.position).normalized;
 
                 MovableComponent.Move(moveDirection);
                 MovableComponent.Rotate(moveDirection);
 
-                AttackComponent.Attack(characterTarget);
-
+                if (Vector3.Distance(CharacterTransform.position, CharacterTarget.CharacterTransform.position) <= AttackComponent.AttackRange)
+                {
+                    AttackComponent.Attack(CharacterTarget);
+                }
                 return;
         }
     }

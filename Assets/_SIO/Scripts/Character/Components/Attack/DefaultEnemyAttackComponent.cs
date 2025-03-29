@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class DefaultEnemyAttackComponent : IAttackComponent
@@ -13,23 +11,19 @@ public class DefaultEnemyAttackComponent : IAttackComponent
 
     public void Attack(Character attackTarget)
     {
-        if (attackTarget == null || selfCharacter == null || Time.time - lastAttackTime < AttackCooldown)
+        if (attackTarget == null || attackTarget.HealthComponent.CurrentHealth <= 0)
             return;
 
-        if (Vector3.Distance(selfCharacter.CharacterTransform.position, 
-            attackTarget.CharacterTransform.position) > AttackRange)
+        if (Time.time - lastAttackTime < AttackCooldown)
+            return;
+
+        if (Vector3.Distance(selfCharacter.CharacterTransform.position, attackTarget.CharacterTransform.position) > AttackRange)
             return;
 
         selfCharacter.CharacterTransform.LookAt(attackTarget.CharacterTransform);
 
-        MeleeAttack(attackTarget);
-
-        lastAttackTime = Time.time;
-    }
-
-    private void MeleeAttack(Character attackTarget)
-    {
         attackTarget.HealthComponent.TakeDamage(AttackDamage);
+        lastAttackTime = Time.time;
     }
 
     public void Initialize(Character selfCharacter)

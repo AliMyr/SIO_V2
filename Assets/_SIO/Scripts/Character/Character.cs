@@ -2,21 +2,19 @@ using UnityEngine;
 
 public abstract class Character : MonoBehaviour
 {
+    [SerializeField] private CharacterType characterType;
     [SerializeField] private CharacterData characterData;
     [SerializeField] private CharacterController characterController;
     [SerializeField] private Transform characterTransform;
 
+    public CharacterType CharacterType => characterType;
     public CharacterData CharacterData => characterData;
     public CharacterController CharacterController => characterController;
     public Transform CharacterTransform => characterTransform;
+    public virtual Character CharacterTarget => null;
 
     public IHealthComponent HealthComponent { get; private set; }
     public IMovableComponent MovableComponent { get; private set; }
-
-    protected virtual void Awake()
-    {
-        Initialize();
-    }
 
     public virtual void Initialize()
     {
