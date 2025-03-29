@@ -8,6 +8,7 @@ public class HealthComponent : IHealthComponent
     private float currentHealth;
 
     public event Action<Character> OnCharacterDeath;
+    public event Action<Character> OnCharacterHealthChange;
 
     public float MaxHealth => maxHealth;
     public float CurrentHealth
