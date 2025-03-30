@@ -28,6 +28,7 @@ public class GameManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
+
         Initialize();
     }
 
@@ -35,7 +36,9 @@ public class GameManager : MonoBehaviour
     {
         scoreSystem = new ScoreSystem();
         isGameActive = false;
+        windowsService.Initialize();
     }
+    
 
     public void StartGame()
     {
