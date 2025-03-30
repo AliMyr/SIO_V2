@@ -6,11 +6,11 @@ public class CharacterFactory : MonoBehaviour
     [SerializeField] private Character playerCharacterPrefab;
     [SerializeField] private Character enemyCharacterPrefab;
 
-    private Dictionary<CharacterType, Queue<Character>> disabledCharacters = new();
-    private List<Character> activeCharacters = new();
+    private readonly Dictionary<CharacterType, Queue<Character>> disabledCharacters = new();
+    private readonly List<Character> activeCharacters = new();
 
     public Character Player { get; private set; }
-    public List<Character> ActiveCharacters => activeCharacters;
+    public IReadOnlyList<Character> ActiveCharacters => activeCharacters;
 
     public Character GetCharacter(CharacterType type)
     {
@@ -20,10 +20,8 @@ public class CharacterFactory : MonoBehaviour
             disabledCharacters[type] = queue;
         }
 
-        Character character = queue.Count > 0 ? queue.Dequeue() : InstantiateCharacter(type);
-
-        if (character == null)
-            return null;
+        var character = queue.Count > 0 ? queue.Dequeue() : InstantiateCharacter(type);
+        if (character == null) return null;
 
         activeCharacters.Add(character);
         return character;
@@ -31,8 +29,7 @@ public class CharacterFactory : MonoBehaviour
 
     public void ReturnCharacter(Character character)
     {
-        if (character == null)
-            return;
+        if (character == null) return;
 
         if (!disabledCharacters.ContainsKey(character.CharacterType))
         {
@@ -45,18 +42,12 @@ public class CharacterFactory : MonoBehaviour
 
     private Character InstantiateCharacter(CharacterType type)
     {
-        Character character = type switch
+        var character = type switch
         {
             CharacterType.Player => Instantiate(playerCharacterPrefab),
             CharacterType.DefaultEnemy => Instantiate(enemyCharacterPrefab),
-            _ => null
+            _ => throw new System.ArgumentException($"Unknown character type: {type}")
         };
-
-        if (character == null)
-        {
-            Debug.LogError($"Unknown character type: {type}");
-            return null;
-        }
 
         if (type == CharacterType.Player)
             Player = character;
