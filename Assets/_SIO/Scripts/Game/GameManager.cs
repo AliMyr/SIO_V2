@@ -28,38 +28,23 @@ public class GameManager : MonoBehaviour
 
         Instance = this;
         DontDestroyOnLoad(gameObject);
-
         Initialize();
     }
 
     private void Initialize()
     {
         scoreSystem = new ScoreSystem();
-        isGameActive = false;
+        scoreSystem.Initialize();
         windowsService.Initialize();
     }
-    
 
     public void StartGame()
     {
         if (isGameActive) return;
 
-        var player = characterFactory.GetCharacter(CharacterType.Player);
-        player.transform.position = Vector3.zero;
-        player.gameObject.SetActive(true);
-
-        player.Initialize(
-            new HealthComponent(),
-            new DefaultMovableComponent(),
-            new PlayerAttackComponent()
-        );
-
-        player.HealthComponent.OnCharacterDeath += OnCharacterDeath;
-
-        gameSessionTime = 0;
-        enemySpawnTimer = gameData.TimeBetweenEnemySpawn;
-
-        scoreSystem.StartGame();
+        SpawnPlayer();
+        ResetTimers();
+        scoreSystem.Reset();
         isGameActive = true;
     }
 
@@ -82,6 +67,34 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private void SpawnPlayer()
+    {
+        var player = characterFactory.GetCharacter(CharacterType.Player);
+        player.transform.position = Vector3.zero;
+        player.gameObject.SetActive(true);
+
+        player.Initialize(new HealthComponent(), new DefaultMovableComponent(), new PlayerAttackComponent());
+        player.HealthComponent.OnCharacterDeath += OnCharacterDeath;
+    }
+
+    private void SpawnEnemy()
+    {
+        if (characterFactory.Player == null) return;
+
+        var enemy = characterFactory.GetCharacter(CharacterType.DefaultEnemy);
+        enemy.transform.position = GetSpawnPosition(characterFactory.Player.transform.position);
+        enemy.gameObject.SetActive(true);
+
+        enemy.Initialize(new HealthComponent(), new DefaultMovableComponent(), new DefaultEnemyAttackComponent());
+        enemy.HealthComponent.OnCharacterDeath += OnCharacterDeath;
+    }
+
+    private Vector3 GetSpawnPosition(Vector3 playerPosition) =>
+        playerPosition + new Vector3(GetOffset(), 0, GetOffset());
+
+    private float GetOffset() =>
+        Random.Range(gameData.MinSpawnOffset, gameData.MaxSpawnOffset) * (Random.value > 0.5f ? 1 : -1);
+
     private void OnCharacterDeath(Character character)
     {
         if (character == null) return;
@@ -100,38 +113,16 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void SpawnEnemy()
+    private void ResetTimers()
     {
-        if (characterFactory.Player == null) return;
-
-        var enemy = characterFactory.GetCharacter(CharacterType.DefaultEnemy);
-        var playerPosition = characterFactory.Player.transform.position;
-
-        enemy.transform.position = GetSpawnPosition(playerPosition);
-        enemy.gameObject.SetActive(true);
-
-        enemy.Initialize(
-            new HealthComponent(),
-            new DefaultMovableComponent(),
-            new DefaultEnemyAttackComponent()
-        );
-
-        enemy.HealthComponent.OnCharacterDeath += OnCharacterDeath;
+        gameSessionTime = 0;
+        enemySpawnTimer = gameData.TimeBetweenEnemySpawn;
     }
-
-    private Vector3 GetSpawnPosition(Vector3 playerPosition)
-    {
-        float offsetX = GetOffset();
-        float offsetZ = GetOffset();
-        return new Vector3(playerPosition.x + offsetX, 0, playerPosition.z + offsetZ);
-    }
-
-    private float GetOffset() => Random.Range(gameData.MinSpawnOffset, gameData.MaxSpawnOffset) * (Random.value > 0.5f ? 1 : -1);
 
     private void EndGame(bool isVictory)
     {
         isGameActive = false;
-        scoreSystem.EndGame();
+        scoreSystem.SaveMaxScore();
 
         WindowsService.HideWindow<GameplayWindow>(true);
         WindowsService.ShowWindow(isVictory ? typeof(VictoryWindow) : typeof(DefeatWindow), false);

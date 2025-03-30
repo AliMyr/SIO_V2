@@ -11,20 +11,16 @@ public class ScoreSystem
     public int MaxScore { get; private set; }
     public bool IsNewScoreRecord { get; private set; }
 
-    public void StartGame()
+    public void Initialize()
     {
-        Score = 0;
         MaxScore = PlayerPrefs.GetInt(SaveKey, 0);
-        IsNewScoreRecord = false;
+        Reset();
     }
 
-    public void EndGame()
+    public void Reset()
     {
-        if (Score <= MaxScore) return;
-
-        MaxScore = Score;
-        PlayerPrefs.SetInt(SaveKey, MaxScore);
-        IsNewScoreRecord = true;
+        Score = 0;
+        IsNewScoreRecord = false;
     }
 
     public void AddScore(int amount)
@@ -33,5 +29,14 @@ public class ScoreSystem
 
         Score += amount;
         OnScoreUpdated?.Invoke(Score);
+    }
+
+    public void SaveMaxScore()
+    {
+        if (Score <= MaxScore) return;
+
+        MaxScore = Score;
+        PlayerPrefs.SetInt(SaveKey, MaxScore);
+        IsNewScoreRecord = true;
     }
 }
