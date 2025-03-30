@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -28,11 +27,10 @@ public class GameManager : MonoBehaviour
             DontDestroyOnLoad(gameObject);
             Initialize();
         }
-        else 
+        else
         {
-            Destroy(this.gameObject);
-            return;
-        }   
+            Destroy(gameObject);
+        }
     }
 
     private void Initialize()
@@ -49,14 +47,20 @@ public class GameManager : MonoBehaviour
         Character player = characterFactory.GetCharacter(CharacterType.Player);
         player.transform.position = Vector3.zero;
         player.gameObject.SetActive(true);
-        player.Initialize();
+
+        player.Initialize(
+            new HealthComponent(),
+            new DefaultMovableComponent(),
+            new PlayerAttackComponent()
+        );
+
         player.HealthComponent.OnCharacterDeath += CharacterDeathHandler;
 
         gameSessionTime = 0;
         timeBetweenEnemySpawn = gameData.TimeBetweenEnemySpawn;
 
         scoreSystem.StartGame();
-        isGameActive=true;
+        isGameActive = true;
     }
 
     private void Update()
@@ -87,16 +91,13 @@ public class GameManager : MonoBehaviour
         deathCharacter.gameObject.SetActive(false);
         characterFactory.ReturnCharacter(deathCharacter);
 
-        switch (deathCharacter.CharacterType)
+        if (deathCharacter.CharacterType == CharacterType.Player)
         {
-            case CharacterType.Player:
-                GameOver();
-
-                break;
-
-            case CharacterType.DefaultEnemy:
-                scoreSystem.AddScore(deathCharacter.CharacterData.ScoreCost);
-                break;
+            GameOver();
+        }
+        else if (deathCharacter.CharacterType == CharacterType.DefaultEnemy)
+        {
+            scoreSystem.AddScore(deathCharacter.CharacterData.ScoreCost);
         }
     }
 
@@ -107,10 +108,15 @@ public class GameManager : MonoBehaviour
 
         Character enemy = characterFactory.GetCharacter(CharacterType.DefaultEnemy);
         Vector3 playerPosition = characterFactory.Player.transform.position;
-        enemy.transform.position = new Vector3(playerPosition.x +
-            GetOffset(), 0, playerPosition.z + GetOffset());
+        enemy.transform.position = new Vector3(playerPosition.x + GetOffset(), 0, playerPosition.z + GetOffset());
         enemy.gameObject.SetActive(true);
-        enemy.Initialize();
+
+        enemy.Initialize(
+            new HealthComponent(),
+            new DefaultMovableComponent(),
+            new DefaultEnemyAttackComponent()
+        );
+
         enemy.HealthComponent.OnCharacterDeath += CharacterDeathHandler;
 
         float GetOffset()
@@ -140,7 +146,7 @@ public class GameManager : MonoBehaviour
 
     private void EndGame()
     {
-        isGameActive = false ;
+        isGameActive = false;
         scoreSystem.EndGame();
     }
 }

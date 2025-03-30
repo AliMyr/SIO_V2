@@ -15,14 +15,21 @@ public abstract class Character : MonoBehaviour
 
     public IHealthComponent HealthComponent { get; private set; }
     public IMovableComponent MovableComponent { get; private set; }
+    public IAttackComponent AttackComponent { get; private set; }
 
-    public virtual void Initialize()
+    public virtual void Initialize(
+        IHealthComponent healthComponent,
+        IMovableComponent movableComponent,
+        IAttackComponent attackComponent = null)
     {
-        HealthComponent = new HealthComponent();
+        HealthComponent = healthComponent;
         HealthComponent.Initialize(this);
 
-        MovableComponent = new DefaultMovableComponent();
+        MovableComponent = movableComponent;
         MovableComponent.Initialize(this);
+
+        AttackComponent = attackComponent;
+        AttackComponent?.Initialize(this);
     }
 
     protected abstract void Update();

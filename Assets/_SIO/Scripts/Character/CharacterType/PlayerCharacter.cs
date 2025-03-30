@@ -1,37 +1,15 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerCharacter : Character
 {
-    public override Character CharacterTarget
+    public override Character CharacterTarget => GetClosestEnemy();
+
+    public override void Initialize(
+        IHealthComponent healthComponent,
+        IMovableComponent movableComponent,
+        IAttackComponent attackComponent)
     {
-        get
-        {
-            Character target = null;
-            float minDistance = float.MaxValue;
-            foreach (Character character in GameManager.Instance.CharacterFactory.ActiveCharacters)
-            {
-                if (character.CharacterType == CharacterType.Player || character.HealthComponent.CurrentHealth <= 0)
-                    continue;
-
-                float distance = Vector3.Distance(character.CharacterTransform.position, CharacterTransform.position);
-                if (distance < minDistance)
-                {
-                    target = character;
-                    minDistance = distance;
-                }
-            }
-            return target;
-        }
-    }
-
-    public IAttackComponent AttackComponent { get; private set; }
-
-    public override void Initialize()
-    {
-        base.Initialize();
-        AttackComponent = new PlayerAttackComponent();
-        AttackComponent.Initialize(this);
+        base.Initialize(healthComponent, movableComponent, attackComponent);
     }
 
     protected override void Update()
@@ -39,15 +17,13 @@ public class PlayerCharacter : Character
         if (HealthComponent.CurrentHealth <= 0)
             return;
 
-        float horizontalInput = Input.GetAxis("Horizontal");
-        float verticalInput = Input.GetAxis("Vertical");
-
-        Vector3 moveDirection = new Vector3(horizontalInput, 0, verticalInput).normalized;
+        Vector3 moveDirection = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical")).normalized;
+        MovableComponent.Move(moveDirection);
 
         if (CharacterTarget != null)
         {
-            Vector3 rotationDirection = CharacterTarget.CharacterTransform.position - CharacterTransform.position;
-            MovableComponent.Rotate(rotationDirection);
+            Vector3 targetDirection = CharacterTarget.CharacterTransform.position - CharacterTransform.position;
+            MovableComponent.Rotate(targetDirection);
 
             if (Vector3.Distance(CharacterTransform.position, CharacterTarget.CharacterTransform.position) <= AttackComponent.AttackRange)
             {
@@ -58,7 +34,26 @@ public class PlayerCharacter : Character
         {
             MovableComponent.Rotate(moveDirection);
         }
+    }
 
-        MovableComponent.Move(moveDirection);
+    private Character GetClosestEnemy()
+    {
+        Character closest = null;
+        float minDistance = float.MaxValue;
+
+        foreach (Character character in GameManager.Instance.CharacterFactory.ActiveCharacters)
+        {
+            if (character.CharacterType == CharacterType.Player || character.HealthComponent.CurrentHealth <= 0)
+                continue;
+
+            float distance = Vector3.Distance(character.CharacterTransform.position, CharacterTransform.position);
+            if (distance < minDistance)
+            {
+                closest = character;
+                minDistance = distance;
+            }
+        }
+
+        return closest;
     }
 }
