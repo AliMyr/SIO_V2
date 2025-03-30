@@ -58,6 +58,6 @@ public class GameplayWindow : Window
         float sessionTime = GameManager.Instance.GameSessionTime;
         int minutes = (int)(sessionTime / 60);
         int seconds = (int)(sessionTime % 60);
-        timerText.text = $"{minutes}:{seconds:D2}";
+        timerText.text = $"{minutes:D2}:{seconds:D2}";
     }
 }
