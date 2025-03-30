@@ -23,7 +23,12 @@ public class GameplayWindow : Window
     {
         base.OpenStart();
 
-        if (player == null) return;
+        player = GameManager.Instance.CharacterFactory.Player;
+        if (player == null)
+        {
+            Debug.LogError("OpenStart: player is still null!", this);
+            return;
+        }
 
         UpdateHealthVisual(player);
         player.HealthComponent.OnCharacterHealthChange += UpdateHealthVisual;
@@ -31,6 +36,7 @@ public class GameplayWindow : Window
         UpdateScore(scoreSystem.Score);
         scoreSystem.OnScoreUpdated += UpdateScore;
     }
+
 
     protected override void CloseStart()
     {

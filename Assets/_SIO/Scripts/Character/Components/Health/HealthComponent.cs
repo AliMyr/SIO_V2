@@ -4,40 +4,32 @@ using UnityEngine;
 public class HealthComponent : IHealthComponent
 {
     private Character selfCharacter;
-    private float currentHealth;
+
+    public float MaxHealth { get; private set; }
+    public float CurrentHealth { get; private set; }
 
     public event Action<Character> OnCharacterDeath;
     public event Action<Character> OnCharacterHealthChange;
-
-    public float MaxHealth { get; private set; }
-    public float CurrentHealth
-    {
-        get => currentHealth;
-        private set
-        {
-            currentHealth = Mathf.Clamp(value, 0, MaxHealth);
-            OnCharacterHealthChange?.Invoke(selfCharacter);
-            if (currentHealth <= 0) Die();
-        }
-    }
 
     public void Initialize(Character selfCharacter)
     {
         this.selfCharacter = selfCharacter;
         MaxHealth = selfCharacter.CharacterData.MaxHealth;
-        currentHealth = MaxHealth;
+        CurrentHealth = MaxHealth;
     }
 
-    public void TakeDamage(float damage)
-    {
-        if (damage > 0)
-            CurrentHealth -= damage;
-    }
+    public void TakeDamage(float damage) => ChangeHealth(-damage);
+    public void Heal(float amount) => ChangeHealth(amount);
 
-    public void Heal(float amount)
+    private void ChangeHealth(float amount)
     {
-        if (amount > 0)
-            CurrentHealth += amount;
+        if (amount == 0) return;
+
+        CurrentHealth = Mathf.Clamp(CurrentHealth + amount, 0, MaxHealth);
+        OnCharacterHealthChange?.Invoke(selfCharacter);
+
+        if (CurrentHealth <= 0) Die();
+
     }
 
     private void Die()
