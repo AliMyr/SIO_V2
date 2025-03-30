@@ -7,28 +7,14 @@ public class OptionsWindow : Window
     [SerializeField] private Toggle soundsToggle;
     [SerializeField] private Button closeButton;
 
-
     public override void Initialize()
     {
-        //musicToggle.onValueChanged.AddListener(MusicToggleHandler);
-        //soundsToggle.onValueChanged.AddListener(SoundsToggleHandler);
-        closeButton.onClick.AddListener(CloseOptionsHandler);
+        closeButton.onClick.AddListener(CloseOptions);
     }
 
-    private void CloseOptionsHandler()
+    private void CloseOptions()
     {
         Hide(true);
         GameManager.Instance.WindowsService.ShowWindow<MainMenuWindow>(false);
     }
-
-    //private void SoundsToggleHandler(bool isEnable)
-    //{
-    //    SimpleAudioSystemService.Instance.SetVolume(AudioSystemType.Sounds, isEnable);
-    //    SimpleAudioSystemService.Instance.SetVolume(AudioSystemType.UISounds, isEnable);
-    //}
-
-    //private void MusicToggleHandler(bool isEnable)
-    //{
-    //    SimpleAudioSystemService.Instance.SetVolume(AudioSystemType.Ambient, isEnable);
-    //}
 }

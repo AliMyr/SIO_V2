@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,9 +10,9 @@ public class WindowsService : MonoBehaviour
     public void Initialize()
     {
         windowsDictionary = new Dictionary<Type, Window>();
-        foreach (Window window in windows)
+        foreach (var window in windows)
         {
-            windowsDictionary.Add(window.GetType(), window);
+            windowsDictionary[window.GetType()] = window;
             window.Hide(true);
             window.Initialize();
         }
@@ -21,30 +20,16 @@ public class WindowsService : MonoBehaviour
         ShowWindow<MainMenuWindow>(true);
     }
 
-    public T GetWindow<T>() where T : Window
-    {
-        return windowsDictionary[typeof(T)] as T;
-    }
+    public T GetWindow<T>() where T : Window => windowsDictionary[typeof(T)] as T;
 
-    public void ShowWindow<T>(bool isImmediately) where T : Window
-    {
-        var window = windowsDictionary[typeof(T)] as T;
-        if (window == null)
-        {
-            Debug.LogError("Not found window");
-            return;
-        }
-        window.Show(isImmediately);
-    }
+    public void ShowWindow<T>(bool isImmediately) where T : Window => GetWindow<T>()?.Show(isImmediately);
+    public void HideWindow<T>(bool isImmediately) where T : Window => GetWindow<T>()?.Hide(isImmediately);
 
-    public void HideWindow<T>(bool isImmediately) where T : Window
+    public void ShowWindow(Type windowType, bool isImmediately)
     {
-        var window = windowsDictionary[typeof(T)] as T;
-        if (window == null)
-        {
-            Debug.LogError("Not found window");
-            return;
-        }
-        window.Hide(isImmediately);
+        if (windowsDictionary.TryGetValue(windowType, out var window))
+            window.Show(isImmediately);
+        else
+            Debug.LogError($"Window of type {windowType} not found.");
     }
 }

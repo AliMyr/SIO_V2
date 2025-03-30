@@ -8,34 +8,30 @@ public class MainMenuWindow : Window
 
     public override void Initialize()
     {
-        startGameButton.onClick.AddListener(StartGameHandler);
-        optionsGameButton.onClick.AddListener(OpenOptionsHandler);
+        startGameButton.onClick.AddListener(StartGame);
+        optionsGameButton.onClick.AddListener(OpenOptions);
     }
 
-    protected override void OpenEnd()
-    {
-        base.OpenEnd();
-        startGameButton.interactable = true;
-        optionsGameButton.interactable = true;
-    }
+    protected override void OpenEnd() => SetButtonsInteractable(true);
+    protected override void CloseStart() => SetButtonsInteractable(false);
 
-    protected override void CloseStart()
+    private void StartGame()
     {
-        base.CloseStart();
-        startGameButton.interactable = false;
-        optionsGameButton.interactable = false;
-    }
-
-    private void StartGameHandler()
-    {
-        GameManager.Instance.StartGame();
-        GameManager.Instance.WindowsService.ShowWindow<GameplayWindow>(true);
+        var gameManager = GameManager.Instance;
+        gameManager.StartGame();
+        gameManager.WindowsService.ShowWindow<GameplayWindow>(true);
         Hide(false);
     }
 
-    private void OpenOptionsHandler()
+    private void OpenOptions()
     {
         Hide(false);
         GameManager.Instance.WindowsService.ShowWindow<OptionsWindow>(true);
+    }
+
+    private void SetButtonsInteractable(bool state)
+    {
+        startGameButton.interactable = state;
+        optionsGameButton.interactable = state;
     }
 }

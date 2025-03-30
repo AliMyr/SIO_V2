@@ -1,33 +1,29 @@
-using System.Collections;
-using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class DefeatWindow : Window
 {
-    [SerializeField]
-    private Button restartButton;
-    [SerializeField]
-    private Button returnToMainMenuButton;
+    [SerializeField] private Button restartButton;
+    [SerializeField] private Button returnToMainMenuButton;
 
     public override void Initialize()
     {
         base.Initialize();
-        restartButton.onClick.AddListener(OnRestartButtonClicked);
-        returnToMainMenuButton.onClick.AddListener(OnReturnToMainMenuButtonClicked);
+        restartButton.onClick.AddListener(RestartGame);
+        returnToMainMenuButton.onClick.AddListener(ReturnToMainMenu);
     }
 
-    private void OnReturnToMainMenuButtonClicked()
+    private void RestartGame()
+    {
+        Hide(true);
+        var windowsService = GameManager.Instance.WindowsService;
+        windowsService.ShowWindow<GameplayWindow>(false);
+        GameManager.Instance.StartGame();
+    }
+
+    private void ReturnToMainMenu()
     {
         Hide(true);
         GameManager.Instance.WindowsService.ShowWindow<MainMenuWindow>(false);
-    }
-
-    private void OnRestartButtonClicked()
-    {
-        Hide(true);
-        GameManager.Instance.WindowsService.ShowWindow<GameplayWindow>(false);
-        GameManager.Instance.StartGame();
     }
 }
